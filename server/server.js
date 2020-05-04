@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const colors = require('colors');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+
 const connectDB = require('./config/db');
 
 //BackEnd Protection
@@ -17,6 +17,7 @@ const dotenv = require('dotenv');
 
 const app = express();
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
 
 dotenv.config({ path: './config/config.env' });
 
@@ -48,6 +49,7 @@ if (process.env.NODE_ENV == 'development') {
 }
 
 app.use('/api', authRoutes);
+app.use('/api', userRoutes);
 
 const PORT = process.env.PORT || 8000;
 

@@ -4,13 +4,15 @@ import Layout from '../core/Layout';
 import axios from 'axios';
 import { authenticate, isAuth } from './helpers';
 import { ToastContainer, toast } from 'react-toastify';
+import Google from './Google';
+import Facebook from './Facebook';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-const Signin = () => {
+const Signin = ({ history }) => {
   const [values, setValues] = useState({
     email: '',
     password: '',
-    buttonText: 'Log In',
+    buttonText: 'Submit',
   });
 
   const { email, password, buttonText } = values;
@@ -18,6 +20,14 @@ const Signin = () => {
   const handleChange = (name) => (event) => {
     // console.log(event.target.value);
     setValues({ ...values, [name]: event.target.value });
+  };
+
+  const informParent = (response) => {
+    authenticate(response, () => {
+      isAuth() && isAuth().role === 'admin'
+        ? history.push('/admin')
+        : history.push('/private');
+    });
   };
 
   const clickSubmit = (event) => {
@@ -39,7 +49,10 @@ const Signin = () => {
             password: '',
             buttonText: 'Submitted',
           });
-          toast.success(`Hey ${response.data.user.name}, Welcome back!`);
+          // toast.success(`Hey ${response.data.user.name}, Welcome back!`);
+          isAuth() && isAuth().role === 'admin'
+            ? history.push('/admin')
+            : history.push('/private');
         });
       })
       .catch((error) => {
@@ -62,7 +75,7 @@ const Signin = () => {
       </div>
 
       <div className='form-group'>
-        <lable className='text-muted'>Password</lable>
+        <label className='text-muted'>Password</label>
         <input
           onChange={handleChange('password')}
           value={password}
@@ -84,8 +97,14 @@ const Signin = () => {
       <div className='col-md-6 offset-md-3'>
         <ToastContainer />
         {isAuth() ? <Redirect to='/' /> : null}
-        <h1 className='p-5 text-center'>Sign In</h1>
+        <h1 className='p-5 text-center'>Signin</h1>
+        <Google informParent={informParent} />
+        <Facebook informParent={informParent} />
         {signinForm()}
+        <br />
+        <Link to='/auth/password/forgot' className='btn btn-outline-danger'>
+          Forgot Password
+        </Link>
       </div>
     </Layout>
   );
